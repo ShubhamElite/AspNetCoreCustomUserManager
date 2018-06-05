@@ -23,13 +23,13 @@ namespace AspNetCoreCustomUserManager
         .SetBasePath(hostingEnvironment.ContentRootPath)
         .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-      this.configuration = configurationBuilder.Build();
+      configuration = configurationBuilder.Build();
     }
 
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddDbContext<Storage>(
-        options => options.UseSqlite(this.configuration.GetConnectionString("DefaultConnection"))
+        options => options.UseSqlite(configuration.GetConnectionString("DefaultConnection"))
       );
 
       services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

@@ -24,24 +24,24 @@ namespace AspNetCoreCustomUserManager
 
     public User Validate(string loginTypeCode, string identifier, string secret)
     {
-      CredentialType credentialType = this.storage.CredentialTypes.FirstOrDefault(ct => string.Equals(ct.Code, loginTypeCode, StringComparison.OrdinalIgnoreCase));
+      CredentialType credentialType = storage.CredentialTypes.FirstOrDefault(ct => string.Equals(ct.Code, loginTypeCode, StringComparison.OrdinalIgnoreCase));
 
       if (credentialType == null)
         return null;
 
-      Credential credential = this.storage.Credentials.FirstOrDefault(
+      Credential credential = storage.Credentials.FirstOrDefault(
         c => c.CredentialTypeId == credentialType.Id && string.Equals(c.Identifier, identifier, StringComparison.OrdinalIgnoreCase) && c.Secret == MD5Hasher.ComputeHash(secret)
       );
 
       if (credential == null)
         return null;
 
-      return this.storage.Users.Find(credential.UserId);
+      return storage.Users.Find(credential.UserId);
     }
 
     public async void SignIn(HttpContext httpContext, User user, bool isPersistent = false)
     {
-      ClaimsIdentity identity = new ClaimsIdentity(this.GetUserClaims(user), CookieAuthenticationDefaults.AuthenticationScheme);
+      ClaimsIdentity identity = new ClaimsIdentity(GetUserClaims(user), CookieAuthenticationDefaults.AuthenticationScheme);
       ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
       await httpContext.SignInAsync(
@@ -74,12 +74,12 @@ namespace AspNetCoreCustomUserManager
 
     public User GetCurrentUser(HttpContext httpContext)
     {
-      int currentUserId = this.GetCurrentUserId(httpContext);
+      int currentUserId = GetCurrentUserId(httpContext);
 
       if (currentUserId == -1)
         return null;
 
-      return this.storage.Users.Find(currentUserId);
+      return storage.Users.Find(currentUserId);
     }
 
     private IEnumerable<Claim> GetUserClaims(User user)
@@ -88,23 +88,23 @@ namespace AspNetCoreCustomUserManager
 
       claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
       claims.Add(new Claim(ClaimTypes.Name, user.Name));
-      claims.AddRange(this.GetUserRoleClaims(user));
+      claims.AddRange(GetUserRoleClaims(user));
       return claims;
     }
 
     private IEnumerable<Claim> GetUserRoleClaims(User user)
     {
       List<Claim> claims = new List<Claim>();
-      IEnumerable<int> roleIds = this.storage.UserRoles.Where(ur => ur.UserId == user.Id).Select(ur => ur.RoleId).ToList();
+      IEnumerable<int> roleIds = storage.UserRoles.Where(ur => ur.UserId == user.Id).Select(ur => ur.RoleId).ToList();
 
       if (roleIds != null)
       {
         foreach (int roleId in roleIds)
         {
-          Role role = this.storage.Roles.Find(roleId);
+          Role role = storage.Roles.Find(roleId);
 
           claims.Add(new Claim(ClaimTypes.Role, role.Code));
-          claims.AddRange(this.GetUserPermissionClaims(role));
+          claims.AddRange(GetUserPermissionClaims(role));
         }
       }
 
@@ -114,13 +114,13 @@ namespace AspNetCoreCustomUserManager
     private IEnumerable<Claim> GetUserPermissionClaims(Role role)
     {
       List<Claim> claims = new List<Claim>();
-      IEnumerable<int> permissionIds = this.storage.RolePermissions.Where(rp => rp.RoleId == role.Id).Select(rp => rp.PermissionId).ToList();
+      IEnumerable<int> permissionIds = storage.RolePermissions.Where(rp => rp.RoleId == role.Id).Select(rp => rp.PermissionId).ToList();
 
       if (permissionIds != null)
       {
         foreach (int permissionId in permissionIds)
         {
-          Permission permission = this.storage.Permissions.Find(permissionId);
+          Permission permission = storage.Permissions.Find(permissionId);
 
           claims.Add(new Claim("Permission", permission.Code));
         }

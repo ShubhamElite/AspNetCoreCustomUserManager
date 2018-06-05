@@ -8,35 +8,35 @@ namespace AspNetCoreCustomUserManager
 {
   public class HomeController : Controller
   {
-    private IUserManager userManager;
+    private IUserManager _userManager;
 
     public HomeController(IUserManager userManager)
     {
-      this.userManager = userManager;
+      _userManager = userManager;
     }
 
     [HttpGet]
     public IActionResult Index()
     {
-      return this.View();
+      return View();
     }
 
     [HttpPost]
     public IActionResult Login()
     {
-      User user = this.userManager.Validate("Email", "admin@example.com", "admin");
+      User user = _userManager.Validate("Email", "admin@example.com", "admin");
 
       if (user != null)
-        this.userManager.SignIn(this.HttpContext, user, false);
+        _userManager.SignIn(HttpContext, user, false);
 
-      return this.RedirectToAction("Index");
+      return RedirectToAction("Index");
     }
 
     [HttpPost]
     public IActionResult Logout()
     {
-      this.userManager.SignOut(this.HttpContext);
-      return this.RedirectToAction("Index");
+      _userManager.SignOut(HttpContext);
+      return RedirectToAction("Index");
     }
   }
 }

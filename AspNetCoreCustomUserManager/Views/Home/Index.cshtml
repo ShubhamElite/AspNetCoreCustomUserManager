@@ -7,10 +7,10 @@
 <div class="form__field field">
   <span class="marker marker--secondary">User.Identity.IsAuthenticated:</span> @User.Identity.IsAuthenticated
 </div>
-@if (this.User.Identity.IsAuthenticated)
+@if (User.Identity.IsAuthenticated)
 {
   <div class="form__field field">
-    <span class="marker marker--secondary">UserManager.GetCurrentUser(this.Context).Name:</span> @UserManager.GetCurrentUser(this.Context).Name
+    <span class="marker marker--secondary">UserManager.GetCurrentUser(Context).Name:</span> @UserManager.GetCurrentUser(Context).Name
   </div>
   <div class="form__field field">
     <span class="marker marker--secondary">User.HasClaim(ClaimTypes.Role, "Administrator"):</span> @User.HasClaim(ClaimTypes.Role, "Administrator")
@@ -19,7 +19,7 @@
     <span class="marker marker--secondary">User.HasClaim("Permission", "DoEverything"):</span> @User.HasClaim("Permission", "DoEverything")
   </div>
 }
-@if (this.User.Identity.IsAuthenticated)
+@if (User.Identity.IsAuthenticated)
 {
   <form class="form" action="/home/logout" method="post">
     <div class="form__buttons buttons">
